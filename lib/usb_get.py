@@ -9,8 +9,6 @@ import time
 import keyboard
 import sys
 
-
-
 class USB_Connect:     #USB 400Hz 刷新率
 
     def __init__(self):
@@ -156,12 +154,6 @@ class USB_Connect:     #USB 400Hz 刷新率
             if(send_flag == 1):
                 data_out.put(Sensor)
 
-
-
-
-
-
-
 class USB_DataDecode:
 
     def __init__(self):
@@ -194,10 +186,6 @@ class USB_DataDecode:
         self.thread_getMessage.start()
         self.thread_usbdecode.start()
 
-
-
-
-
     def close_usb(self):
         self.thread_getMessage.terminate()
         self.thread_getMessage.join()
@@ -205,10 +193,8 @@ class USB_DataDecode:
         self.thread_usbdecode.terminate()
         self.thread_usbdecode.join()
 
-
     def save(self):
         print('zhibin')
-
 
     def key_monitoring(self):
         keyboard.add_hotkey('c', self.save())  # 初始化验证

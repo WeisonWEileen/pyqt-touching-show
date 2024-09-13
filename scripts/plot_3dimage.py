@@ -6,7 +6,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 import numpy as np
-import random #随机数生成
+import random 
 import matplotlib.pyplot as plt
 import multiprocessing
 from multiprocessing import Queue
@@ -16,7 +16,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 import sys
 import time
-import threading  # 导入threading模块
+import threading
 import serial
 import pandas as pd
 import csv
@@ -26,7 +26,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         super().__init__()
 
         self.setupUi(self)
-        self.setWindowIcon(QIcon('lib/image.png'))
+        self.setWindowIcon(QIcon('asserts/image.png'))
         self.init() #界面按钮初始化
 
         # 绘图部件
@@ -226,6 +226,9 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.p3.setData(z=z,colors=rgba_img)
         #显示第一个数值
         self.textBrowser.append(str(z[0][0]))  # 在指定的区域显示提示信息
+    
+
+
 
 
 
@@ -237,14 +240,14 @@ def closehand():
 
 
 if __name__ == '__main__':
-    multiprocessing.freeze_support()
-    try:
-        com = serial.Serial('COM6', 2000000)
-        com.close()
-    except Exception as e:
-        print("---异常---：", e)
-        sys.exit(0)
-
+    # multiprocessing.freeze_support()
+    # try:
+    #     com = serial.Serial('COM6', 2000000)
+    #     com.close()
+    # except Exception as e:
+    #     print("---异常---：", e)
+    #     sys.exit(0)
+    # print("开始")
     app = QtWidgets.QApplication(sys.argv)
     window = PLOT_3D()
     window.show()
