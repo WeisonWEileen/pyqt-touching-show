@@ -11,7 +11,8 @@ import matplotlib.pyplot as plt
 import multiprocessing
 from multiprocessing import Queue
 import lib.usb_get as usb_get
-from lib.ui import Ui_Form
+# from lib.ui import Ui_Form
+from lib.test import Ui_Form
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 import sys

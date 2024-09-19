@@ -14,3 +14,6 @@ python -m scripts.te
 - windows 11
 - PyQt 5
 - python 3.8
+
+#### examples official examples from local machine
+- python F:\Anoconda_python\installation\Lib\site-packages\pyqtgraph\examples\GLGradientLegendItem.py 

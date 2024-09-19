@@ -295,7 +295,7 @@
     </font>
    </property>
    <property name="title">
-    <string>高度 prediction visualizaiton</string>
+    <string>高度 预测</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="leftMargin">
@@ -342,7 +342,7 @@
     </font>
    </property>
    <property name="title">
-    <string>xy touch point visualizaiton</string>
+    <string>xy 触碰版预测</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <property name="leftMargin">
