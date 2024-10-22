@@ -8,7 +8,9 @@ import numpy as np
 import time
 import keyboard
 import sys
+import queue
 
+import csv
 class USB_Connect:     #USB 400Hz 刷新率
 
     def __init__(self):
@@ -19,16 +21,12 @@ class USB_Connect:     #USB 400Hz 刷新率
         self.coefficient = 100
 
 
-
     def Message_decode(self,data_flag):
-
         try:
-            self.com = serial.Serial('COM6', 2000000)
+            self.com = serial.Serial('COM4', 2000000)
         except Exception as e:
             print("---异常---：", e)
             sys.exit(0)
-
-
 
         while True:
             #包头截取
@@ -37,7 +35,6 @@ class USB_Connect:     #USB 400Hz 刷新率
                 if(self.com.read(3) != b'\xbb\xbb\xbb'):
                     continue
             else: continue
-
             while True:
                 data = self.com.read((64+2)*4)
 
@@ -47,8 +44,6 @@ class USB_Connect:     #USB 400Hz 刷新率
                 #print('ok')
 
                 data_flag.put(data)
-
-
 
     def sendMessage(self, message):
         self.tcp_client.write(message.encode(encoding='utf-8'))
@@ -65,8 +60,6 @@ class USB_Connect:     #USB 400Hz 刷新率
         while q.qsize() > 0:
             res.append(q.get())
 
-
-
     def init_data(self,data_flag):
         init_data_buffer = [0 for i in range(0,64)]
         data_buffer = {n: [] for n in range(64)}
@@ -74,9 +67,6 @@ class USB_Connect:     #USB 400Hz 刷新率
         for i in range(20):
 
             udp_data = data_flag.get(True)
-
-
-
             for i in range(64):
                 min_num = 6 + i * 4
                 max_num = 8 + i * 4
@@ -91,8 +81,12 @@ class USB_Connect:     #USB 400Hz 刷新率
 
         return init_data_buffer
 
+    def save_to_csv(self, csv_file, max_value):
+        with open(csv_file, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([max_value])
 
-    def usb_decode(self,data_flag,data_out,data_z,GUI_order):
+    def usb_decode(self,data_flag,data_out,data_z,GUI_order,max_value_array):
         data_buffer = {n: [] for n in range(64)}
 
         z = np.zeros((64, 64))
@@ -104,6 +98,9 @@ class USB_Connect:     #USB 400Hz 刷新率
         #初始化，求均值
         init_data = self.init_data(data_flag)
 
+
+        
+
         while True:
             udp_data = data_flag.get(True) #接收数据
 
@@ -112,11 +109,6 @@ class USB_Connect:     #USB 400Hz 刷新率
                 max_num = 8+i*4
                 data_hend = struct.unpack('>H', udp_data[min_num-2:max_num-2])[0]
                 data_decode = struct.unpack('>H',udp_data[min_num:max_num])[0] / self.coefficient - init_data[data_hend]
-
-                #if(data_decode<88):  data_decode = 0
-
-                
-                #print(data_decode)
 
 
                 if(len(data_buffer[data_hend]) <100 ):
@@ -136,6 +128,21 @@ class USB_Connect:     #USB 400Hz 刷新率
             #data_out.put(Sensor)
             data_z.put([z,0])
 
+            # print("====",np.max(z))
+
+
+            current_max = np.max(z)
+            if(max_value_array.full()):
+                max_value_array.get()
+            max_value_array.put(current_max)
+            # print("current_max", current_max)
+            print("current_max: {:.2f}".format(current_max))
+            # max_values.append(current_max)
+            # # 保持数组的大小不超过 100
+            # if len(max_values) > 100:
+            #     max_values.pop(0)
+            # max_value_array.append(current_max)
+            # print("decode", return_max_value)
 
             #是否保存数据
             if (GUI_order.empty() == False):   #接收到采样标志后开始采样
@@ -148,8 +155,6 @@ class USB_Connect:     #USB 400Hz 刷新率
                     deta_time = time.time() - strat_time
                     print(deta_time)
                     send_flag = 0
-
-
 
             if(send_flag == 1):
                 data_out.put(Sensor)
@@ -164,10 +169,12 @@ class USB_DataDecode:
         #多进程
         self.data_flag = Queue() #更新状态
         self.data_out = Queue()  #数据解析结果
-
         self.plot_z = Queue()  # 数据解析结果
-
+        
         self.GUI_order = Queue()  # GUI控制数据解析
+        # self.max_value_array = Queue(maxsize=100) # 保存最大值传到上位机
+        
+        self.max_value_array = Queue(maxsize=100) # 保存最大值传到上位机
 
 
         #进程1 接收数据
@@ -175,7 +182,7 @@ class USB_DataDecode:
         self.thread_getMessage = multiprocessing.Process(target=self.T.Message_decode,args=(self.data_flag,))
 
         #进程2 处理数据
-        self.thread_usbdecode = multiprocessing.Process(target=self.T.usb_decode,args=(self.data_flag,self.data_out,self.plot_z,self.GUI_order))
+        self.thread_usbdecode = multiprocessing.Process(target=self.T.usb_decode,args=(self.data_flag,self.data_out,self.plot_z,self.GUI_order, self.max_value_array))
 
         # 进程3 数据解析
         #self.thread_key_monitoring = multiprocessing.Process(target=self.key_monitoring, args=())
@@ -183,7 +190,9 @@ class USB_DataDecode:
 
         #self.eat_process = multiprocessing.Process(target=self.eat, args=(3, "giao"))
         print("主进程ID:", os.getpid())
-        self.thread_getMessage.start()
+        self.thread_getMessage.start(
+
+        )
         self.thread_usbdecode.start()
 
     def close_usb(self):
@@ -199,14 +208,6 @@ class USB_DataDecode:
     def key_monitoring(self):
         keyboard.add_hotkey('c', self.save())  # 初始化验证
         keyboard.wait()
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     usb = USB_DataDecode()

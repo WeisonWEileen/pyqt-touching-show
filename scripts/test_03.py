@@ -1,7 +1,6 @@
 # import os
 # import sys
 # sys.path.insert(0, os.getcwd())
-
 from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
@@ -11,8 +10,7 @@ import matplotlib.pyplot as plt
 import multiprocessing
 from multiprocessing import Queue
 import lib.usb_get as usb_get
-# from lib.ui import Ui_Form
-from lib.ui_ui import Ui_Form
+from lib.ui_ball import Ui_Form
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 import sys
@@ -21,6 +19,7 @@ import threading
 import serial
 import pandas as pd
 import csv
+
 
 class PLOT_3D(QtWidgets.QWidget, Ui_Form):
     def __init__(self):
@@ -73,7 +72,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
 
 
 
-        # self.usbdata = usb_get.USB_DataDecode()
+        self.usbdata = usb_get.USB_DataDecode()
         self.sensor = []
 
         self.verticalLayout_graph.addWidget(self.w)  # 添加绘图部件到网格布局层
@@ -100,35 +99,22 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.savedata_button.setText("Start Save")
 
 
-    def generate_sine_wave_data(self):
-        t = 0
-        while self.running:
-            self.z = np.sin(np.linspace(0, 2 * np.pi, 64) + t).reshape(64, 1) * np.sin(np.linspace(0, 2 * np.pi, 64)).reshape(1, 64)
-            self.rgba_img = self.cmap((self.z - self.minZ) / (self.maxZ - self.minZ))
-            time.sleep(0.1)
-            t += 0.1
-
     def port_open(self):
         print("开始")
-        self.running = True
-        self.thread = threading.Thread(target=self.generate_sine_wave_data)
-        self.thread.start()
-        self.textBrowser_3.append("开始检测")
+        self.clear_Queue(self.usbdata.data_out) #清空队列
+        self.usbdata.GUI_order.put('start')     #发送开始
+        self.textBrowser_3.append("开始检测")  # 在指定的区域显示提示信息
         self.timer_save.start(1)
-
 
     def start_measure(self):
         print("清空")
         self.sensor = []
 
-
     def port_close(self):
-        self.running = False
-        if self.thread.is_alive():
-            self.thread.join()
-        self.timer_save.stop()
+        self.usbdata.GUI_order.put('stop')  # 发送结束
+        self.timer_save.stop()  # 停止
         self.sensor = []
-        self.textBrowser_3.append("已停止")
+        self.textBrowser_3.append("已停止")  # 在指定的区域显示提示信息
         print("已停止")
 
     def save_data(self):
@@ -219,24 +205,46 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         while q.qsize() > 0:
             res.append(q.get())
 
-
+    #绘图
     def update_plot(self):
-        self.p3.setData(z=self.z, colors=self.rgba_img)
-        self.textBrowser.append(str(self.z[0][0]))
 
+        z = self.usbdata.plot_z.get(True)[0]
+        self.clear_Queue(self.usbdata.plot_z) # 清空队列
+
+        #3D绘图可视化
+
+        z = pg.gaussianFilter(z,(4,4))   #高斯平滑
+
+
+        # max = np.max(z)
+        max_value_list = []
+        while not self.usbdata.max_value_array.empty():
+            max_value_list.append(self.usbdata.max_value_array.get())
+
+        # max_value_list = max(list(self.usbdata.max_value_array))
+        
+        print("====length=====",len(max_value_list))
+        max_value = max(max_value_list)
+        # self.clear_Queue(self.usbdata.max_value_array)
+        # print("master", max_value)
+
+
+        rgba_img = self.cmap(z)
+        self.p3.setData(z=z,colors=rgba_img)
+        #显示第一个数值
+        self.textBrowser.append(str(z[0][0]))  #在指定的区域显示提示信息
+
+        # print(max)
+        self.verticalGroupBox_2.update_ball_position(max_value)
 
 def closehand():
     print('close')
 
-
-
-
-
 if __name__ == '__main__':
-
     app = QtWidgets.QApplication(sys.argv)
     window = PLOT_3D()
     window.show()
     sys.exit(app.exec_())
+
 
 

@@ -1,7 +1,3 @@
-# import os
-# import sys
-# sys.path.insert(0, os.getcwd())
-
 from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
@@ -97,7 +93,6 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.timer_save = QtCore.QTimer()
         self.timer_save.timeout.connect(self.save_timer)
         self.savedata_button.setText("Start Save")
-
 
     def port_open(self):
         print("开始")
@@ -203,15 +198,10 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
             savedata = [int_time] + list(self.sensor)
             self.write_data(savedata)
 
-
-
-
-
     def clear_Queue(self,q):
         res = []
         while q.qsize() > 0:
             res.append(q.get())
-
 
     #绘图
     def update_plot(self):
@@ -227,27 +217,10 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         #显示第一个数值
         self.textBrowser.append(str(z[0][0]))  # 在指定的区域显示提示信息
     
-
-
-
-
-
 def closehand():
     print('close')
 
-
-
-
-
 if __name__ == '__main__':
-    # multiprocessing.freeze_support()
-    # try:
-    #     com = serial.Serial('COM6', 2000000)
-    #     com.close()
-    # except Exception as e:
-    #     print("---异常---：", e)
-    #     sys.exit(0)
-    # print("开始")
     app = QtWidgets.QApplication(sys.argv)
     window = PLOT_3D()
     window.show()

@@ -11,8 +11,7 @@ import matplotlib.pyplot as plt
 import multiprocessing
 from multiprocessing import Queue
 import lib.usb_get as usb_get
-# from lib.ui import Ui_Form
-from lib.ui_ui import Ui_Form
+from lib.ui_ball import Ui_Form
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 import sys
@@ -174,7 +173,6 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
             self.textBrowser_3.append("保存结束")  # 在指定的区域显示提示信息
             self.savedata_button.setText("Start Save")
 
-
     def quit(self):
         try:
             self.usbdata.close_usb()
@@ -219,21 +217,15 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         while q.qsize() > 0:
             res.append(q.get())
 
-
     def update_plot(self):
         self.p3.setData(z=self.z, colors=self.rgba_img)
         self.textBrowser.append(str(self.z[0][0]))
-
+        # self.verticalGroupBox_2.update_ball_position()
 
 def closehand():
     print('close')
 
-
-
-
-
 if __name__ == '__main__':
-
     app = QtWidgets.QApplication(sys.argv)
     window = PLOT_3D()
     window.show()

@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: test_03",
+            "type": "python",
+            "request": "launch",
+            "module": "scripts.test_03",
+            "justMyCode": false
+        }
+    ]
+}
