@@ -210,32 +210,31 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
 
         z = self.usbdata.plot_z.get(True)[0]
         self.clear_Queue(self.usbdata.plot_z) # 清空队列
+        # z = self.usbdata.plot_z.get(True)[0]
+        # self.clear_Queue(self.usbdata.plot_z) # 清空队列
 
         #3D绘图可视化
 
         z = pg.gaussianFilter(z,(4,4))   #高斯平滑
 
-
-        # max = np.max(z)
-        max_value_list = []
-        while not self.usbdata.max_value_array.empty():
-            max_value_list.append(self.usbdata.max_value_array.get())
-
         # max_value_list = max(list(self.usbdata.max_value_array))
-        
-        print("====length=====",len(max_value_list))
-        max_value = max(max_value_list)
+
         # self.clear_Queue(self.usbdata.max_value_array)
         # print("master", max_value)
-
 
         rgba_img = self.cmap(z)
         self.p3.setData(z=z,colors=rgba_img)
         #显示第一个数值
         self.textBrowser.append(str(z[0][0]))  #在指定的区域显示提示信息
 
-        # print(max)
-        self.verticalGroupBox_2.update_ball_position(max_value)
+        try: 
+            max_value = self.usbdata.max_va.get(False)
+            max_value = max_value/20
+            print("plot",max_value)
+            self.verticalGroupBox_2.update_ball_position(max_value)
+        except Exception as e:
+            print("plot",max_value)
+            self.verticalGroupBox_2.update_ball_position(0)
 
 def closehand():
     print('close')

@@ -22,3 +22,6 @@ python -m scripts.te_02
 
 ### usb接收频率和上位机画图的频率的比值大概是
 <img src="image.png" alt="alt text" style="width:45%;">
+
+### @TODO
+- 直接在 usb 端 使用检测1000帧里面的最大值，做个渐变

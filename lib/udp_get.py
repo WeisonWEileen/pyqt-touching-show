@@ -83,7 +83,7 @@ class TcpClient:
         return init_data_buffer
 
 
-    def udp_decode(self,data_flag,data_out,data_z,GUI_order):
+    def udp_decode(self,data_flag,data_out,data_z,GUI_order,):
         data_buffer = {n: [] for n in range(64)}
 
         z = np.zeros((64, 64))
@@ -94,6 +94,7 @@ class TcpClient:
 
         #初始化，求均值
         init_data = self.init_data(data_flag)
+
 
         while True:
             udp_data = data_flag.get(True) #接收数据
@@ -112,18 +113,24 @@ class TcpClient:
                     data_buffer[data_hend][:-1] = data_buffer[data_hend][1:]  # shift data in the array one sample left
                     data_buffer[data_hend][-1] = data_decode
 
-
-
             for i in range(8):
                 for j in range(8):
                     z[63 - j * 8,63 - i * 8] = data_buffer[i*8 + j][-1]
                     Sensor[7 - j,7 - i] = data_buffer[i*8 + j][-1]
 
-
-
-
             #data_out.put(Sensor)
             data_z.put([z,0])
+
+
+
+            # if(count < 100 ):
+            #     max_array.append = np.max(z)
+            #     count += 1
+            # else:
+            #     max_array = 
+            #     np.max(max_array[-10:])
+
+            
 
 
             #是否保存数据
@@ -141,19 +148,6 @@ class TcpClient:
                 data_out.put(Sensor)
                 strat_time = time.time()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 class UDP_DataDecode:
 
     def __init__(self):
@@ -168,6 +162,7 @@ class UDP_DataDecode:
         self.plot_z = Queue()  # 数据解析结果
 
         self.GUI_order = Queue()  # GUI控制数据解析
+
 
 
         #进程1 接收数据

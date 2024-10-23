@@ -86,7 +86,8 @@ class USB_Connect:     #USB 400Hz 刷新率
             writer = csv.writer(file)
             writer.writerow([max_value])
 
-    def usb_decode(self,data_flag,data_out,data_z,GUI_order,max_value_array):
+    def usb_decode(self,data_flag,data_out,data_z,GUI_order,max_va):
+    # def usb_decode(self,data_flag,data_out,data_z,GUI_order):
         data_buffer = {n: [] for n in range(64)}
 
         z = np.zeros((64, 64))
@@ -99,7 +100,9 @@ class USB_Connect:     #USB 400Hz 刷新率
         init_data = self.init_data(data_flag)
 
 
-        
+        max_value = 0
+        count = 0
+
 
         while True:
             udp_data = data_flag.get(True) #接收数据
@@ -130,19 +133,15 @@ class USB_Connect:     #USB 400Hz 刷新率
 
             # print("====",np.max(z))
 
-
-            current_max = np.max(z)
-            if(max_value_array.full()):
-                max_value_array.get()
-            max_value_array.put(current_max)
-            # print("current_max", current_max)
-            print("current_max: {:.2f}".format(current_max))
-            # max_values.append(current_max)
-            # # 保持数组的大小不超过 100
-            # if len(max_values) > 100:
-            #     max_values.pop(0)
-            # max_value_array.append(current_max)
-            # print("decode", return_max_value)
+            if count < 100:
+                if max_value < np.max(z):
+                    max_value = np.max(z)
+                count += 1
+            else:
+                max_va.put(max_value)
+                print(max_value)
+                max_value = 0
+                count = 0
 
             #是否保存数据
             if (GUI_order.empty() == False):   #接收到采样标志后开始采样
@@ -174,7 +173,8 @@ class USB_DataDecode:
         self.GUI_order = Queue()  # GUI控制数据解析
         # self.max_value_array = Queue(maxsize=100) # 保存最大值传到上位机
         
-        self.max_value_array = Queue(maxsize=100) # 保存最大值传到上位机
+        self.max_va = Queue()
+
 
 
         #进程1 接收数据
@@ -182,7 +182,7 @@ class USB_DataDecode:
         self.thread_getMessage = multiprocessing.Process(target=self.T.Message_decode,args=(self.data_flag,))
 
         #进程2 处理数据
-        self.thread_usbdecode = multiprocessing.Process(target=self.T.usb_decode,args=(self.data_flag,self.data_out,self.plot_z,self.GUI_order, self.max_value_array))
+        self.thread_usbdecode = multiprocessing.Process(target=self.T.usb_decode,args=(self.data_flag,self.data_out,self.plot_z,self.GUI_order, self.max_va))
 
         # 进程3 数据解析
         #self.thread_key_monitoring = multiprocessing.Process(target=self.key_monitoring, args=())
