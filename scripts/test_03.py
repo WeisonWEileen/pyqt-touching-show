@@ -5,9 +5,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph as pg
 import pyqtgraph.opengl as gl
 import numpy as np
-import random 
 import matplotlib.pyplot as plt
-import multiprocessing
 from multiprocessing import Queue
 import lib.usb_get as usb_get
 from lib.ui_ball import Ui_Form
@@ -15,8 +13,6 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 import sys
 import time
-import threading
-import serial
 import pandas as pd
 import csv
 
@@ -227,13 +223,17 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         #显示第一个数值
         self.textBrowser.append(str(z[0][0]))  #在指定的区域显示提示信息
 
+        # max_value = 0
         try: 
             max_value = self.usbdata.max_va.get(False)
             max_value = max_value/20
-            print("plot",max_value)
+            print("================")
+            print("plot", "{:.2f}".format(max_value))
+            print("================")
             self.verticalGroupBox_2.update_ball_position(max_value)
+            
         except Exception as e:
-            print("plot",max_value)
+            print("plot", "{:.2f}".format(max_value))
             self.verticalGroupBox_2.update_ball_position(0)
 
 def closehand():

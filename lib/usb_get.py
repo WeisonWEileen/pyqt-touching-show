@@ -139,7 +139,7 @@ class USB_Connect:     #USB 400Hz 刷新率
                 count += 1
             else:
                 max_va.put(max_value)
-                print(max_value)
+                # print(max_value)
                 max_value = 0
                 count = 0
 

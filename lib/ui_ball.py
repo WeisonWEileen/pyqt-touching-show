@@ -9,6 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from lib.ball_widget import BouncingBall
+# from scripts.test_ball import BouncingBall
 
 class Ui_Form(object):
     def setupUi(self, Form):
