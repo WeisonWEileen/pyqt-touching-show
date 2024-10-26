@@ -39,20 +39,31 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         ## Add a grid to the view
         self.g = gl.GLGridItem()
         self.g.scale(2, 2, 1)
+        self.g.setColor((0, 0, 0, 255))
         self.g.setDepthValue(10)  # draw grid after surfaces since they may be translucent
         self.w.addItem(self.g)
-
 
         ## Manually specified colors
         self.z = pg.gaussianFilter(np.random.normal(size=(64, 64)), (1, 1))
         self.x = np.linspace(-12, 12, 64)
         self.y = np.linspace(-12, 12, 64)
+        self.radius = 12 
+        for i in range(64):
+            for j in range(64):
+                    # self.z[i][j] = np.sqrt(self.radius**2 - self.x[i]**2 - self.y[j]**2)
+                    self.z[i][j] = np.sqrt(self.radius**2 - self.x[i]**2 )
+        # self.z = np.array()
+        print("=====",type(self.z))
+        print("=====",self.z.shape)
+        print("=====",self.z)
 
         self.cmap = plt.get_cmap('rainbow')
         self.minZ=np.min(self.z)
         self.maxZ=np.max(self.z)
         self.rgba_img = self.cmap((self.z-self.minZ)/(self.maxZ -self.minZ))
 
+
+        # self.p3 = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
         self.p3 = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
         self.p3.scale(16. / 49., 16. / 49., 1.0)
         self.p3.translate(-10, -10, 0)
@@ -206,17 +217,9 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
 
         z = self.usbdata.plot_z.get(True)[0]
         self.clear_Queue(self.usbdata.plot_z) # 清空队列
-        # z = self.usbdata.plot_z.get(True)[0]
-        # self.clear_Queue(self.usbdata.plot_z) # 清空队列
-
-        #3D绘图可视化
 
         z = pg.gaussianFilter(z,(4,4))   #高斯平滑
-
-        # max_value_list = max(list(self.usbdata.max_value_array))
-
-        # self.clear_Queue(self.usbdata.max_value_array)
-        # print("master", max_value)
+        z = self.z + z
 
         rgba_img = self.cmap(z)
         self.p3.setData(z=z,colors=rgba_img)
@@ -224,6 +227,8 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.textBrowser.append(str(z[0][0]))  #在指定的区域显示提示信息
 
         # max_value = 0
+
+        # 更新小球的高度
         try: 
             max_value = self.usbdata.max_va.get(False)
             max_value = max_value/20

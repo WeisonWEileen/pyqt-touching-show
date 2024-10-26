@@ -48,6 +48,11 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.x = np.linspace(-12, 12, 64)
         self.y = np.linspace(-12, 12, 64)
 
+        # 节目效果，单个
+        # self.z = pg.gaussianFilter(np.random.normal(size=(94, 94)), (1, 1))
+        # self.x = np.linspace(-12, 12, 94)
+        # self.y = np.linspace(-12, 12, 94)
+    
         self.cmap = plt.get_cmap('rainbow')
         self.minZ=np.min(self.z)
         self.maxZ=np.max(self.z)
