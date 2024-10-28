@@ -219,11 +219,13 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.clear_Queue(self.usbdata.plot_z) # 清空队列
 
         z = pg.gaussianFilter(z,(4,4))   #高斯平滑
-        # z = self.z + z
-        # z = self.z + z
 
-        rgba_img = self.cmap(z)
-        self.p3.setData(z=z,colors=rgba_img)
+        # rgba_origin = self.cmap(z)
+        rgba_offset = self.cmap(z)
+        z = self.z + z
+
+        # rgba_img = self.cmap(z) - rgba_origin
+        self.p3.setData(z=z,colors=rgba_offset)
         #显示第一个数值
         self.textBrowser.append(str(z[0][0]))  #在指定的区域显示提示信息
 
