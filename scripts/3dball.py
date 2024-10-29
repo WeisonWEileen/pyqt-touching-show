@@ -223,13 +223,8 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         # rgba_origin = self.cmap(z)
         rgba_offset = self.cmap(z)
         z = self.z + z
+        self.p3.setData(z=z,colors=rgba_img)
 
-        # rgba_img = self.cmap(z) - rgba_origin
-        self.p3.setData(z=z,colors=rgba_offset)
-        #显示第一个数值
-        self.textBrowser.append(str(z[0][0]))  #在指定的区域显示提示信息
-
-        # max_value = 0
 
         # 更新小球的高度
         try: 
