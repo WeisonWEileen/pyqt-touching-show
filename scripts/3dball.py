@@ -101,11 +101,30 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         # 退出应用
         self.quit_Button.clicked.connect(self.quit)
 
+        #柔性展示
+        self.skin_button.clicked.connect(self.skin_display)
+
         self.timer_save = QtCore.QTimer()
         self.timer_save.timeout.connect(self.save_timer)
         self.savedata_button.setText("Start Save")
 
+    def skin_display(self):
+        # 新窗口画传感器柔性展示
+        self.s = gl.GLViewWidget()
+        self.s.show()
+        self.s.setWindowTitle('e-skin')
+        self.s.setCameraPosition(distance=32)
+        print("电子皮肤柔性展示")
 
+        self.g_s = gl.GLGridItem()
+        self.g_s.scale(2, 2, 1)
+        self.g_s.setDepthValue(10)  # draw grid after surfaces since they may be translucent
+        self.s.addItem(self.g_s)
+
+        self.p3_s = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
+        self.p3_s.scale(16. / 49., 16. / 49., 1.0)
+        self.p3_s.translate(-10, -10, 0)
+        self.s.addItem(self.p3_s)
     def port_open(self):
         print("开始")
         self.clear_Queue(self.usbdata.data_out) #清空队列
@@ -219,11 +238,15 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.clear_Queue(self.usbdata.plot_z) # 清空队列
 
         z = pg.gaussianFilter(z,(4,4))   #高斯平滑
-
-        # rgba_origin = self.cmap(z)
-        rgba_offset = self.cmap(z)
-        z = self.z + z
+        rgba_img = self.cmap(z)
         self.p3.setData(z=z,colors=rgba_img)
+        #显示第一个数值
+        self.textBrowser.append(str(z[0][0]))  # 在指定的区域显示提示信息
+        
+        #显示到新窗口中
+        rgba_img = self.cmap(z)
+        z = self.z + z
+        self.p3_s.setData(z=z,colors=rgba_img)
 
 
         # 更新小球的高度
@@ -236,7 +259,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
             self.verticalGroupBox_2.update_ball_position(max_value)
             
         except Exception as e:
-            print("plot", "{:.2f}".format(max_value))
+            # print("plot", "{:.2f}".format(max_value))
             self.verticalGroupBox_2.update_ball_position(0)
 
 def closehand():

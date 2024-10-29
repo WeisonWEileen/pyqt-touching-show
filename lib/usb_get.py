@@ -23,7 +23,7 @@ class USB_Connect:     #USB 400Hz 刷新率
 
     def Message_decode(self,data_flag):
         try:
-            self.com = serial.Serial('COM4', 2000000)
+            self.com = serial.Serial('COM20', 2000000)
         except Exception as e:
             print("---异常---：", e)
             sys.exit(0)
