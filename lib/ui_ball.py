@@ -89,6 +89,11 @@ class Ui_Form(object):
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(False)
+        ########## 电子皮肤展示按钮 ################
+        self.skin_button = QtWidgets.QPushButton(self.formGroupBox)
+        self.skin_button.setObjectName("skin_button")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.skin_button)
+        ###########################################
         self.quit_Button.setFont(font)
         self.quit_Button.setObjectName("quit_Button")
         self.gridLayout.addWidget(self.quit_Button, 1, 0, 1, 2)
@@ -194,6 +199,9 @@ class Ui_Form(object):
         self.start_measure_button.setText(_translate("Form", "清空"))
         self.savedata_button.setText(_translate("Form", "保存数据"))
         self.groupBox_4.setTitle(_translate("Form", "接收状态"))
+        ############
+        self.skin_button.setText(_translate("Form", "柔性展示"))
+        ############
         self.label.setText(_translate("Form", "DATA0"))
         self.label_2.setText(_translate("Form", "DATA1"))
         self.label_3.setText(_translate("Form", "DATA2"))
