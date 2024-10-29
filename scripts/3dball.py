@@ -69,6 +69,10 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.p3.translate(-10, -10, 0)
         self.w.addItem(self.p3)
 
+        self.p3_s = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
+        self.p3_s.scale(16. / 49., 16. / 49., 1.0)
+        self.p3_s.translate(-10, -10, 0)
+
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
@@ -121,9 +125,6 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.g_s.setDepthValue(10)  # draw grid after surfaces since they may be translucent
         self.s.addItem(self.g_s)
 
-        self.p3_s = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
-        self.p3_s.scale(16. / 49., 16. / 49., 1.0)
-        self.p3_s.translate(-10, -10, 0)
         self.s.addItem(self.p3_s)
     def port_open(self):
         print("开始")
@@ -259,7 +260,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
             self.verticalGroupBox_2.update_ball_position(max_value)
             
         except Exception as e:
-            # print("plot", "{:.2f}".format(max_value))
+            print("plot", "{:.2f}".format(max_value))
             self.verticalGroupBox_2.update_ball_position(0)
 
 def closehand():
