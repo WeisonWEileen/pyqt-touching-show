@@ -65,11 +65,37 @@ class Ui_Form(object):
             }
         """)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalGroupBox)
-        self.verticalLayout.setContentsMargins(10, 10, 10, 10)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.verticalLayout_graph = QtWidgets.QVBoxLayout()
         self.verticalLayout_graph.setObjectName("verticalLayout_graph")
         self.verticalLayout.addLayout(self.verticalLayout_graph)
+
+        #状态指示灯
+        self.statusLight = QtWidgets.QGroupBox(Form)
+        self.statusLight.setGeometry(QtCore.QRect(1640, 200, 100, 100))
+        self.statusLight.setFont(font)
+        self.statusLight.setObjectName("statusLight")
+        self.statusLight.setStyleSheet("""
+            QGroupBox {
+                border: 1px solid black;  /* 边框颜色和粗细 */
+                border-radius: 50px;       /* 边框圆角半径 */
+                margin-top: 0px;         /* 标题上方的间距 */
+                background-color: green;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top center; /* 标题位置 */
+                padding: 0 3px;                 /* 标题内边距 */
+            }
+        """)
+        self.lightLayout = QtWidgets.QVBoxLayout(self.statusLight)
+        self.lightLayout.setContentsMargins(10, 10, 10, 10)
+        self.lightLayout.setObjectName("lightLayout")
+        self.lightLayout_graph = QtWidgets.QVBoxLayout()
+        self.lightLayout_graph.setObjectName("lightLayout_graph")
+        self.lightLayout.addLayout(self.lightLayout_graph)
+
         self.groupBox = QtWidgets.QGroupBox(Form)
         self.groupBox.setGeometry(QtCore.QRect(80, 290, 171, 151))
         self.groupBox.setTitle("")
@@ -149,7 +175,7 @@ class Ui_Form(object):
                 padding: 0 3px;                 /* 标题内边距 */
             }
         """)
-        self.verticalGroupBox_2.setGeometry(QtCore.QRect(1370, 90, 300, 300))
+        self.verticalGroupBox_2.setGeometry(QtCore.QRect(1310, 90, 300, 300))
         self.layoutWidget = QtWidgets.QWidget(Form)
         self.layoutWidget.setGeometry(QtCore.QRect(1440, 510, 2, 2))
         self.layoutWidget.setObjectName("layoutWidget")
@@ -170,7 +196,7 @@ class Ui_Form(object):
                 padding: 0 3px;                 /* 标题内边距 */
             }
         """)
-        self.verticalGroupBox_3.setGeometry(QtCore.QRect(1370, 400, 300, 300))
+        self.verticalGroupBox_3.setGeometry(QtCore.QRect(1310, 400, 300, 300))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(False)
@@ -222,4 +248,46 @@ class Ui_Form(object):
         self.verticalGroupBox_3.setTitle(_translate("Form", "xy touch point visualizaiton"))
         self.verticalGroupBox_2.setTitle(_translate("Form", "Bouncing ball"))
 
-
+    def setStatusColor(self, color):
+        if(color=='red'):
+            self.statusLight.setStyleSheet("""
+                QGroupBox {
+                    border: 1px solid black;  /* 边框颜色和粗细 */
+                    border-radius: 50px;       /* 边框圆角半径 */
+                    margin-top: 0px;         /* 标题上方的间距 */
+                    background-color: red;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    subcontrol-position: top center; /* 标题位置 */
+                    padding: 0 3px;                 /* 标题内边距 */
+                }
+            """)
+        if(color=='green'):
+            self.statusLight.setStyleSheet("""
+                QGroupBox {
+                    border: 1px solid black;  /* 边框颜色和粗细 */
+                    border-radius: 50px;       /* 边框圆角半径 */
+                    margin-top: 0px;         /* 标题上方的间距 */
+                    background-color: green;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    subcontrol-position: top center; /* 标题位置 */
+                    padding: 0 3px;                 /* 标题内边距 */
+                }
+            """)
+        if(color=='yellow'):
+            self.statusLight.setStyleSheet("""
+                QGroupBox {
+                    border: 1px solid black;  /* 边框颜色和粗细 */
+                    border-radius: 50px;       /* 边框圆角半径 */
+                    margin-top: 0px;         /* 标题上方的间距 */
+                    background-color: yellow;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    subcontrol-position: top center; /* 标题位置 */
+                    padding: 0 3px;                 /* 标题内边距 */
+                }
+            """)

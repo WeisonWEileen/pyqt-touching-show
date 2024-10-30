@@ -16,7 +16,6 @@ import time
 import pandas as pd
 import csv
 
-
 class PLOT_3D(QtWidgets.QWidget, Ui_Form):
     def __init__(self):
         super().__init__()
@@ -85,6 +84,15 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.p3_xy.translate(-10, -10, 0)
         self.xy.addItem(self.p3_xy)
 
+        # 状态指示灯绘图部件
+        Ui_Form.setStatusColor(self,color='green')
+        # self.light = gl.GLViewWidget()
+        # self.light.show()
+        # self.light.setBackgroundColor(pg.mkColor(255, 0, 0))
+
+        # self.lightLayout_graph.addWidget(self.light)
+
+
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
@@ -100,6 +108,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
 
         self.verticalLayout_graph.addWidget(self.w)  # 添加绘图部件到网格布局层
         self.verticalLayout_graph_4.addWidget(self.xy) # 添加绘图部件到网格布局层
+       
 
     """定义信号与槽"""
 
@@ -274,6 +283,12 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
             print("================")
             print("plot", "{:.2f}".format(max_value))
             print("================")
+            if(max_value>=20):
+                Ui_Form.setStatusColor(self,color='red')
+            elif(max_value>=10):
+                Ui_Form.setStatusColor(self,color='yellow')
+            elif(max_value>=0):
+                Ui_Form.setStatusColor(self,color='green')
             self.verticalGroupBox_2.update_ball_position(max_value)
             
         except Exception as e:
