@@ -16,7 +16,6 @@ import time
 import pandas as pd
 import csv
 
-
 class PLOT_3D(QtWidgets.QWidget, Ui_Form):
     def __init__(self):
         super().__init__()
@@ -34,14 +33,19 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.w = gl.GLViewWidget()
         self.w.show()
         self.w.setWindowTitle('pyqtgraph example: GLSurfacePlot')
-        self.w.setCameraPosition(distance=64)
+        self.w.setCameraPosition(distance=32)
 
-        ## Add a grid to the view
+        # xy平面坐标显示绘图部件
+        self.xy = gl.GLViewWidget()
+        self.xy.show()
+        # self.w.setWindowTitle('pyqtgraph example: GLSurfacePlot')
+        self.xy.setCameraPosition(distance=20, elevation=-90, azimuth=0)
+
         self.g = gl.GLGridItem()
-        self.g.scale(2, 2, 1)
-        self.g.setColor((0, 0, 0, 255))
+        self.g.scale(2, 2.05, 1)
+        self.g.setColor((221, 221, 221))
         self.g.setDepthValue(10)  # draw grid after surfaces since they may be translucent
-        self.w.addItem(self.g)
+        self.xy.addItem(self.g)
 
         ## Manually specified colors
         self.z = pg.gaussianFilter(np.random.normal(size=(64, 64)), (1, 1))
@@ -69,6 +73,26 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.p3.translate(-10, -10, 0)
         self.w.addItem(self.p3)
 
+        # 新建窗口绘图部件
+        self.p3_s = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
+        self.p3_s.scale(16. / 49., 16. / 49., 1.0)
+        self.p3_s.translate(-10, -10, 0)
+
+        # xy平面坐标显示绘图部件
+        self.p3_xy = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
+        self.p3_xy.scale(16. / 49., 16. / 49., 1.0)
+        self.p3_xy.translate(-10, -10, 0)
+        self.xy.addItem(self.p3_xy)
+
+        # 状态指示灯绘图部件
+        Ui_Form.setStatusColor(self,color='green')
+        # self.light = gl.GLViewWidget()
+        # self.light.show()
+        # self.light.setBackgroundColor(pg.mkColor(255, 0, 0))
+
+        # self.lightLayout_graph.addWidget(self.light)
+
+
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
@@ -83,6 +107,8 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.sensor = []
 
         self.verticalLayout_graph.addWidget(self.w)  # 添加绘图部件到网格布局层
+        self.verticalLayout_graph_4.addWidget(self.xy) # 添加绘图部件到网格布局层
+       
 
     """定义信号与槽"""
 
@@ -100,10 +126,28 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
 
         # 退出应用
         self.quit_Button.clicked.connect(self.quit)
+        
+        #柔性展示
+        self.skin_button.clicked.connect(self.skin_display)
 
         self.timer_save = QtCore.QTimer()
         self.timer_save.timeout.connect(self.save_timer)
         self.savedata_button.setText("Start Save")
+
+    def skin_display(self):
+        # 新窗口画传感器柔性展示
+        self.s = gl.GLViewWidget()
+        self.s.show()
+        self.s.setWindowTitle('e-skin')
+        self.s.setCameraPosition(distance=32)
+        print("电子皮肤柔性展示")
+
+        # self.g_s = gl.GLGridItem()
+        # self.g_s.scale(2, 2, 1)
+        # self.g_s.setDepthValue(10)  # draw grid after surfaces since they may be translucent
+        # self.s.addItem(self.g_s)
+
+        self.s.addItem(self.p3_s)
 
 
     def port_open(self):
@@ -219,28 +263,56 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.clear_Queue(self.usbdata.plot_z) # 清空队列
 
         z = pg.gaussianFilter(z,(4,4))   #高斯平滑
-        # z = self.z + z
-        # z = self.z + z
-
         rgba_img = self.cmap(z)
         self.p3.setData(z=z,colors=rgba_img)
         #显示第一个数值
-        self.textBrowser.append(str(z[0][0]))  #在指定的区域显示提示信息
+        self.textBrowser.append(str(z[0][0]))  # 在指定的区域显示提示信息
+        
+        #显示到xy平面窗口中
+        self.p3_xy.setData(z=z,colors=rgba_img)
+        
+        #显示到新窗口中
+        rgba_img = self.cmap(z)
+        z = self.z + z
+        self.p3_s.setData(z=z,colors=rgba_img)
 
-        # max_value = 0
-
-        # 更新小球的高度
+        # 更新小球的高度和平面位置
         try: 
             max_value = self.usbdata.max_va.get(False)
             max_value = max_value/20
             print("================")
             print("plot", "{:.2f}".format(max_value))
             print("================")
+            if(max_value>=20):
+                Ui_Form.setStatusColor(self,color='red')
+            elif(max_value>=10):
+                Ui_Form.setStatusColor(self,color='yellow')
+            elif(max_value>=0):
+                Ui_Form.setStatusColor(self,color='green')
             self.verticalGroupBox_2.update_ball_position(max_value)
             
         except Exception as e:
             print("plot", "{:.2f}".format(max_value))
             self.verticalGroupBox_2.update_ball_position(0)
+
+        # try:
+        #     max_sensor = self.usbdata.max_sensor.get(False)[0]
+        #     self.clear_Queue(self.usbdata.plot_z) # 清空队列
+        #     max_value = np.max(max_sensor)/20
+        #     print("================")
+        #     print("plot", "{:.2f}".format(max_value))
+        #     print("================")
+        #     self.verticalGroupBox_2.update_ball_position(max_value)
+
+        #     max_sensor = pg.gaussianFilter(max_sensor,(4,4))   #高斯平滑
+        #     xy_img = self.cmap(max_sensor)
+        #     self.p3.setData(z=max_sensor,colors=xy_img) # xy平面
+
+        # except Exception as e:
+        #     print("plot", "{:.2f}".format(max_value))
+        #     self.verticalGroupBox_2.update_ball_position(0)
+
+
 
 def closehand():
     print('close')

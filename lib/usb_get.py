@@ -23,7 +23,7 @@ class USB_Connect:     #USB 400Hz 刷新率
 
     def Message_decode(self,data_flag):
         try:
-            self.com = serial.Serial('COM4', 2000000)
+            self.com = serial.Serial('COM20', 2000000)
         except Exception as e:
             print("---异常---：", e)
             sys.exit(0)
@@ -86,7 +86,7 @@ class USB_Connect:     #USB 400Hz 刷新率
             writer = csv.writer(file)
             writer.writerow([max_value])
 
-    def usb_decode(self,data_flag,data_out,data_z,GUI_order,max_va):
+    def usb_decode(self,data_flag,data_out,data_z,GUI_order,max_va,max_sensor):
     # def usb_decode(self,data_flag,data_out,data_z,GUI_order):
         data_buffer = {n: [] for n in range(64)}
 
@@ -101,6 +101,7 @@ class USB_Connect:     #USB 400Hz 刷新率
 
 
         max_value = 0
+        # max_array = []
         count = 0
 
 
@@ -125,23 +126,27 @@ class USB_Connect:     #USB 400Hz 刷新率
             for i in range(8):
                 for j in range(8):
                     z[j * 8, i * 8] = data_buffer[i*8 + j][-1]
-                    Sensor[j,i] = data_buffer[i*8 + j][-1] * self.coefficient
+                    # Sensor[j,i] = data_buffer[i*8 + j][-1] * self.coefficient
 
             #z[0,0] = 1000
             #data_out.put(Sensor)
-            data_z.put([z,0])
+            data_z.put([z,0]) #?
 
             # print("====",np.max(z))
 
             if count < 100:
                 if max_value < np.max(z):
                     max_value = np.max(z)
+                    # max_array = z
+                    # print('max_array',max_array)
                 count += 1
             else:
                 max_va.put(max_value)
-                # print(max_value)
+                # max_sensor.put([max_array,0])
+                # print(np.max(z))
                 max_value = 0
                 count = 0
+                # max_array = []
 
             #是否保存数据
             if (GUI_order.empty() == False):   #接收到采样标志后开始采样
@@ -174,6 +179,7 @@ class USB_DataDecode:
         # self.max_value_array = Queue(maxsize=100) # 保存最大值传到上位机
         
         self.max_va = Queue()
+        self.max_sensor = Queue()
 
 
 
@@ -182,7 +188,7 @@ class USB_DataDecode:
         self.thread_getMessage = multiprocessing.Process(target=self.T.Message_decode,args=(self.data_flag,))
 
         #进程2 处理数据
-        self.thread_usbdecode = multiprocessing.Process(target=self.T.usb_decode,args=(self.data_flag,self.data_out,self.plot_z,self.GUI_order, self.max_va))
+        self.thread_usbdecode = multiprocessing.Process(target=self.T.usb_decode,args=(self.data_flag,self.data_out,self.plot_z,self.GUI_order, self.max_va, self.max_sensor))
 
         # 进程3 数据解析
         #self.thread_key_monitoring = multiprocessing.Process(target=self.key_monitoring, args=())

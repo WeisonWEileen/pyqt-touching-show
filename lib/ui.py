@@ -32,6 +32,11 @@ class Ui_Form(object):
         self.close_button = QtWidgets.QPushButton(self.formGroupBox)
         self.close_button.setObjectName("close_button")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.close_button)
+        ##########
+        self.skin_button = QtWidgets.QPushButton(self.formGroupBox)
+        self.skin_button.setObjectName("skin_button")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.skin_button)
+        ##########
         self.verticalGroupBox = QtWidgets.QGroupBox(Form)
         self.verticalGroupBox.setGeometry(QtCore.QRect(350, 40, 1441, 821))
         font = QtGui.QFont()
@@ -121,6 +126,9 @@ class Ui_Form(object):
         self.formGroupBox.setTitle(_translate("Form", "启动设置"))
         self.open_button.setText(_translate("Form", "开始检测"))
         self.close_button.setText(_translate("Form", "停止检测"))
+        ############
+        self.skin_button.setText(_translate("Form", "柔性展示"))
+        ############
         self.verticalGroupBox.setTitle(_translate("Form", "测试窗口"))
         self.quit_Button.setText(_translate("Form", "退出"))
         self.start_measure_button.setText(_translate("Form", "清空"))
