@@ -131,7 +131,7 @@ class USB_Connect:     #USB 400Hz 刷新率
             for i in range(8):
                 for j in range(8):
                     z[j * 8, i * 8] = data_buffer[i*8 + j][-1]
-                    Sensor[j,i] = data_buffer[i*8 + j][-1]# * self.coefficient
+                    # Sensor[j,i] = data_buffer[i*8 + j][-1]# * self.coefficient
 
             #z[0,0] = 1000
             #data_out.put(Sensor)

@@ -44,7 +44,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.g = gl.GLGridItem()
         self.g.scale(2, 2.05, 1)
         self.g.setColor((221, 221, 221))
-        self.g.setDepthValue(-30)  # draw grid after surfaces since they may be translucent
+        self.g.setDepthValue(-40)  # draw grid after surfaces since they may be translucent
         self.xy.addItem(self.g)
 
         ## Manually specified colors
@@ -77,6 +77,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.p3_s = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
         self.p3_s.scale(16. / 49., 16. / 49., 1.0)
         self.p3_s.translate(-10, -10, 0)
+        self.update_flag = 0
 
         # xy平面坐标显示绘图部件
         self.p3_xy = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
@@ -91,6 +92,12 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         # self.light.setBackgroundColor(pg.mkColor(255, 0, 0))
 
         # self.lightLayout_graph.addWidget(self.light)
+
+        #小球碰撞窗口
+        self.p3_b1 = gl.GLSurfacePlotItem(z=self.z,colors=self.rgba_img)
+        self.p3_b1.scale(16. / 49., 16. / 49., 1.0)
+        self.p3_b1.translate(-10, -10, 0)
+
 
 
 
@@ -130,9 +137,42 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         #柔性展示
         self.skin_button.clicked.connect(self.skin_display)
 
+        #小球展示
+        self.ball_button.clicked.connect(self.ball_detect_start)
+        self.ball_detect_array = []
+        self.ball_max_value = []
+        self.ball_button_stop.clicked.connect(self.ball_detect_stop)
+
         self.timer_save = QtCore.QTimer()
         self.timer_save.timeout.connect(self.save_timer)
         self.savedata_button.setText("Start Save")
+
+
+    def ball_detect_start(self):
+        self.ball_detect_array = []
+        self.ball_max_value = []
+    
+    def ball_detect_stop(self):
+        temp1 = self.ball_detect_array
+        temp2 = np.array(self.ball_max_value)
+        sorted_indices = np.argsort(temp2)
+        self.b1 = gl.GLViewWidget()
+        self.b1.show()
+        self.b1.setWindowTitle('Ball Detect')
+        self.b1.setCameraPosition(distance=32)
+        self.b1.addItem(self.p3_b1 )
+        print("小球碰撞结果演示")
+
+        self.b1.addItem(self.p3_b1)
+        z = temp1[sorted_indices[-1]]
+        rgba_img = self.cmap(z)
+        self.p3_b1.setData(z=z,colors=rgba_img)
+
+        # print(len(self.ball_detect_array))
+        # self.ball_detect_array = []
+
+
+
 
     def skin_display(self):
         # 新窗口画传感器柔性展示
@@ -141,6 +181,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.s.setWindowTitle('e-skin')
         self.s.setCameraPosition(distance=32)
         print("电子皮肤柔性展示")
+        self.update_flag = 1
 
         # self.g_s = gl.GLGridItem()
         # self.g_s.scale(2, 2, 1)
@@ -153,20 +194,22 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
     def port_open(self):
         print("开始")
         self.clear_Queue(self.usbdata.data_out) #清空队列
-        self.usbdata.GUI_order.put('start')     #发送开始
-        self.textBrowser_3.append("开始检测")  # 在指定的区域显示提示信息
+        # self.usbdata.GUI_order.put('start')     #发送开始
+        # self.textBrowser_3.append("开始检测")  # 在指定的区域显示提示信息
         self.timer_save.start(1)
+        self.timer.start(1)
 
     def start_measure(self):
         print("清空")
         self.sensor = []
 
     def port_close(self):
-        self.usbdata.GUI_order.put('stop')  # 发送结束
-        self.timer_save.stop()  # 停止
-        self.sensor = []
-        self.textBrowser_3.append("已停止")  # 在指定的区域显示提示信息
-        print("已停止")
+        # self.usbdata.GUI_order.put('stop')  # 发送结束
+        # self.timer_save.stop()  # 停止
+        # self.sensor = []
+        # self.textBrowser_3.append("已停止")  # 在指定的区域显示提示信息
+        # print("已停止")
+        self.timer.stop()
 
     def save_data(self):
         int_time = time.strftime("%Y年%m月%d日 %H时%M分%S秒", time.localtime())
@@ -266,22 +309,25 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         rgba_img = self.cmap(z)
         self.p3.setData(z=z,colors=rgba_img)
         #显示第一个数值
-        self.textBrowser.append(str(z[0][0]))  # 在指定的区域显示提示信息
+        self.textBrowser.append(str(round(z[0][0],5)))  # 在指定的区域显示提示信息
         
         #显示到新窗口中
-        rgba_img = self.cmap(z)
-        z = self.z + z
-        self.p3_s.setData(z=z,colors=rgba_img)
+        if (self.update_flag == 1):
+            rgba_img = self.cmap(z)
+            z = self.z + z
+            self.p3_s.setData(z=z,colors=rgba_img)
 
 
         #显示到xy平面窗口中以及小球
         try:
             z = self.usbdata.max_sensor.get(False)[0]
             self.clear_Queue(self.usbdata.max_sensor) # 清空队列
+            # print(self.ball_detect_array.shape[1])
+
             max_value = np.max(z)/10
-            print("================")
-            print("plot", "{:.2f}".format(max_value))
-            print("================")
+            # print("================")
+            # print("plot", "{:.2f}".format(max_value))
+            # print("================")
 
             if(max_value>=20):
                 Ui_Form.setStatusColor(self,color='red')
@@ -295,9 +341,22 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
             xy_img = self.cmap(z)
             self.p3_xy.setData(z=z,colors=xy_img) # xy平面
 
+
+            if(len(self.ball_detect_array)<50):
+                self.ball_detect_array.append(z)
+                self.ball_max_value.append(max_value)
+            else:
+                self.ball_detect_array = []
+                self.ball_max_value = []
+                self.ball_detect_array.append(z)
+                self.ball_max_value.append(max_value)
+            # if(self.ball_detect_array.shape[1]>=2):
+            #     self.ball_detect_array = np.array([])
+
         except Exception as e:
-            print("plot", "{:.2f}".format(max_value))
-            self.verticalGroupBox_2.update_ball_position(0)
+            pass
+            # print("plot", "{:.2f}".format(max_value))
+            # self.verticalGroupBox_2.update_ball_position(0)
 
 
 
