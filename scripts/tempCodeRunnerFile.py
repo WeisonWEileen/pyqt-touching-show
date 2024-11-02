@@ -1,1 +1,1 @@
-print("plot", "{:.2f}".format(max_value))
+xy_img

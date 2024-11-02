@@ -16,7 +16,7 @@ class BouncingBall(QtWidgets.QGroupBox):
         self.setLayout(layout)
 
         self.plot = self.view.addPlot()
-        self.plot.setYRange(0, 10)
+        self.plot.setYRange(0, 20)
         self.plot.setXRange(-5, 5)
 
         self.ball = pg.ScatterPlotItem(size=30, pen=pg.mkPen('w'), brush=pg.mkBrush('b'))

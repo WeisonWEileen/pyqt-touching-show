@@ -39,7 +39,8 @@ class USB_Connect:     #USB 400Hz 刷新率
                 data = self.com.read((64+2)*4)
 
                 if(data[0:4] != b'\xaa\xaa\xaa\xaa' or data[-4:] != b'\xbb\xbb\xbb\xbb'): #包头，包尾核对
-                    print('erro')
+                    # print('erro')
+                    print(data[0:4],'     ',data[-4:])
                     break
                 #print('ok')
 
@@ -101,7 +102,7 @@ class USB_Connect:     #USB 400Hz 刷新率
 
 
         max_value = 0
-        # max_array = []
+        max_array = np.zeros((64,64))
         count = 0
 
 
@@ -117,8 +118,12 @@ class USB_Connect:     #USB 400Hz 刷新率
 
                 if(len(data_buffer[data_hend]) <100 ):
                     data_buffer[data_hend].append(data_decode)
+                    #print(data_hend)
                 else:
                     data_buffer[data_hend][:-1] = data_buffer[data_hend][1:]  # shift data in the array one sample left
+                    # print(data_hend)
+                    # print(data_buffer.shape)
+
                     data_buffer[data_hend][-1] = data_decode
 
 
@@ -126,7 +131,7 @@ class USB_Connect:     #USB 400Hz 刷新率
             for i in range(8):
                 for j in range(8):
                     z[j * 8, i * 8] = data_buffer[i*8 + j][-1]
-                    # Sensor[j,i] = data_buffer[i*8 + j][-1] * self.coefficient
+                    Sensor[j,i] = data_buffer[i*8 + j][-1]# * self.coefficient
 
             #z[0,0] = 1000
             #data_out.put(Sensor)
@@ -137,12 +142,14 @@ class USB_Connect:     #USB 400Hz 刷新率
             if count < 100:
                 if max_value < np.max(z):
                     max_value = np.max(z)
-                    # max_array = z
-                    # print('max_array',max_array)
+                    max_array = z.copy()
+                    # np.set_printoptions(threshold=np.inf)
+                    # print('max_array',Sensor)
+                    #print('max_value',max_value)
                 count += 1
             else:
-                max_va.put(max_value)
-                # max_sensor.put([max_array,0])
+                # max_va.put(max_value)
+                max_sensor.put([max_array,0])
                 # print(np.max(z))
                 max_value = 0
                 count = 0

@@ -44,7 +44,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.g = gl.GLGridItem()
         self.g.scale(2, 2.05, 1)
         self.g.setColor((221, 221, 221))
-        self.g.setDepthValue(10)  # draw grid after surfaces since they may be translucent
+        self.g.setDepthValue(-30)  # draw grid after surfaces since they may be translucent
         self.xy.addItem(self.g)
 
         ## Manually specified colors
@@ -268,21 +268,21 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         #显示第一个数值
         self.textBrowser.append(str(z[0][0]))  # 在指定的区域显示提示信息
         
-        #显示到xy平面窗口中
-        self.p3_xy.setData(z=z,colors=rgba_img)
-        
         #显示到新窗口中
         rgba_img = self.cmap(z)
         z = self.z + z
         self.p3_s.setData(z=z,colors=rgba_img)
 
-        # 更新小球的高度和平面位置
-        try: 
-            max_value = self.usbdata.max_va.get(False)
-            max_value = max_value/20
+
+        #显示到xy平面窗口中以及小球
+        try:
+            z = self.usbdata.max_sensor.get(False)[0]
+            self.clear_Queue(self.usbdata.max_sensor) # 清空队列
+            max_value = np.max(z)/10
             print("================")
             print("plot", "{:.2f}".format(max_value))
             print("================")
+
             if(max_value>=20):
                 Ui_Form.setStatusColor(self,color='red')
             elif(max_value>=10):
@@ -290,27 +290,14 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
             elif(max_value>=0):
                 Ui_Form.setStatusColor(self,color='green')
             self.verticalGroupBox_2.update_ball_position(max_value)
-            
+
+            z = pg.gaussianFilter(z,(4,4))   #高斯平滑
+            xy_img = self.cmap(z)
+            self.p3_xy.setData(z=z,colors=xy_img) # xy平面
+
         except Exception as e:
             print("plot", "{:.2f}".format(max_value))
             self.verticalGroupBox_2.update_ball_position(0)
-
-        # try:
-        #     max_sensor = self.usbdata.max_sensor.get(False)[0]
-        #     self.clear_Queue(self.usbdata.plot_z) # 清空队列
-        #     max_value = np.max(max_sensor)/20
-        #     print("================")
-        #     print("plot", "{:.2f}".format(max_value))
-        #     print("================")
-        #     self.verticalGroupBox_2.update_ball_position(max_value)
-
-        #     max_sensor = pg.gaussianFilter(max_sensor,(4,4))   #高斯平滑
-        #     xy_img = self.cmap(max_sensor)
-        #     self.p3.setData(z=max_sensor,colors=xy_img) # xy平面
-
-        # except Exception as e:
-        #     print("plot", "{:.2f}".format(max_value))
-        #     self.verticalGroupBox_2.update_ball_position(0)
 
 
 
