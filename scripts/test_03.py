@@ -44,7 +44,8 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.g = gl.GLGridItem()
         self.g.scale(2, 2.05, 1)
         self.g.setColor((221, 221, 221))
-        self.g.setDepthValue(-40)  # draw grid after surfaces since they may be translucent
+        self.g.setDepthValue(-1)  # draw grid after surfaces since they may be translucent
+        self.g.setSpacing(1, 1, 1)  # 调整网格线之间的间距
         self.xy.addItem(self.g)
 
         ## Manually specified colors
@@ -139,6 +140,7 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
 
         #小球展示
         self.ball_button.clicked.connect(self.ball_detect_start)
+        self.ball_flag = 0
         self.ball_detect_array = []
         self.ball_max_value = []
         self.ball_button_stop.clicked.connect(self.ball_detect_stop)
@@ -151,6 +153,20 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
     def ball_detect_start(self):
         self.ball_detect_array = []
         self.ball_max_value = []
+
+        self.ball_showflag = 0
+
+        ###########################################
+        #连续小球碰撞展示
+        # self.b1 = gl.GLViewWidget()
+        # self.b1.show()
+        # self.b1.setWindowTitle('Ball Detect')
+        # self.b1.setCameraPosition(distance=32)
+        # self.b1.addItem(self.p3_b1 )
+        # print("小球碰撞结果演示")
+        # self.b1.addItem(self.p3_b1)
+
+        # self.ball_flag = 1
     
     def ball_detect_stop(self):
         temp1 = self.ball_detect_array
@@ -163,13 +179,32 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
         self.b1.addItem(self.p3_b1 )
         print("小球碰撞结果演示")
 
+        if (self.ball_showflag == 0):
+            self.ball_showflag = 1
+
         self.b1.addItem(self.p3_b1)
-        z = temp1[sorted_indices[-1]]
+        if (self.ball_showflag == 1):
+            z = temp1[sorted_indices[-1]]
+            self.ball_showflag += 1
+        elif (self.ball_showflag == 2):
+            z = temp1[sorted_indices[-2]]
+            self.ball_showflag += 1
+        elif (self.ball_showflag == 3):
+            z = temp1[sorted_indices[-3]]
+            self.ball_showflag = 0
+        else:
+            pass
         rgba_img = self.cmap(z)
         self.p3_b1.setData(z=z,colors=rgba_img)
 
-        # print(len(self.ball_detect_array))
+
+
+        print(len(self.ball_detect_array))
         # self.ball_detect_array = []
+        ############################################
+        #连续小球碰撞展示
+        # self.b1.close()
+        # self.ball_flag = 0
 
 
 
@@ -337,21 +372,30 @@ class PLOT_3D(QtWidgets.QWidget, Ui_Form):
                 Ui_Form.setStatusColor(self,color='green')
             self.verticalGroupBox_2.update_ball_position(max_value)
 
-            z = pg.gaussianFilter(z,(4,4))   #高斯平滑
-            xy_img = self.cmap(z)
-            self.p3_xy.setData(z=z,colors=xy_img) # xy平面
+            if (self.ball_flag == 0):
+                z = pg.gaussianFilter(z,(4,4))   #高斯平滑
+                xy_img = self.cmap(z)
+                self.p3_xy.setData(z=z,colors=xy_img) # xy平面
+            elif (self.ball_flag == 1):
+                z = pg.gaussianFilter(z,(4,4))   #高斯平滑
+                xy_img = self.cmap(z)
+                self.p3_b1.setData(z=z,colors=xy_img) # xy平面
 
-
-            if(len(self.ball_detect_array)<50):
-                self.ball_detect_array.append(z)
-                self.ball_max_value.append(max_value)
+            #小球弹跳多个数据采集窗口
+            if (self.ball_showflag == 0):
+                if(len(self.ball_detect_array)<100):
+                    self.ball_detect_array.append(z)
+                    self.ball_max_value.append(max_value)
+                else:
+                    print('Ball detectio time out')
+                    self.ball_detect_array = []
+                    self.ball_max_value = []
+                    self.ball_detect_array.append(z)
+                    self.ball_max_value.append(max_value)
+                if(self.ball_detect_array.shape[1]>=2):
+                    self.ball_detect_array = np.array([])
             else:
-                self.ball_detect_array = []
-                self.ball_max_value = []
-                self.ball_detect_array.append(z)
-                self.ball_max_value.append(max_value)
-            # if(self.ball_detect_array.shape[1]>=2):
-            #     self.ball_detect_array = np.array([])
+                pass
 
         except Exception as e:
             pass

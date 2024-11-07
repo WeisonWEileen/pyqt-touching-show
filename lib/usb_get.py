@@ -139,7 +139,7 @@ class USB_Connect:     #USB 400Hz 刷新率
 
             # print("====",np.max(z))
 
-            if count < 100:
+            if count < 30:
                 if max_value < np.max(z):
                     max_value = np.max(z)
                     max_array = z.copy()

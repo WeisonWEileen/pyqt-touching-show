@@ -17,6 +17,10 @@ class Ui_Form(object):
         Form.setFont(font)
         Form.setAutoFillBackground(False)
 
+        font = QtGui.QFont()
+        font.setPointSize(15)
+        font.setBold(False)
+
         
 
         # 设置背景颜色为白色
@@ -35,6 +39,7 @@ class Ui_Form(object):
         self.formGroupBox = QtWidgets.QGroupBox(Form)
         self.formGroupBox.setGeometry(QtCore.QRect(10, 90, 341, 250))
         self.formGroupBox.setObjectName("formGroupBox")
+        self.formGroupBox.setFont(font)
         self.formLayout = QtWidgets.QFormLayout(self.formGroupBox)
         self.formLayout.setContentsMargins(10, 10, 10, 10)
         self.formLayout.setSpacing(10)
@@ -47,9 +52,7 @@ class Ui_Form(object):
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.close_button)
         self.verticalGroupBox = QtWidgets.QGroupBox(Form)
         self.verticalGroupBox.setGeometry(QtCore.QRect(390, 80, 851, 631))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(False)
+
         self.verticalGroupBox.setFont(font)
         self.verticalGroupBox.setObjectName("verticalGroupBox")
         self.verticalGroupBox.setStyleSheet("""
@@ -65,7 +68,7 @@ class Ui_Form(object):
             }
         """)
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalGroupBox)
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setContentsMargins(10, 10, 10, 10)
         self.verticalLayout.setObjectName("verticalLayout")
         self.verticalLayout_graph = QtWidgets.QVBoxLayout()
         self.verticalLayout_graph.setObjectName("verticalLayout_graph")
@@ -112,20 +115,23 @@ class Ui_Form(object):
         sizePolicy.setVerticalStretch(2)
         sizePolicy.setHeightForWidth(self.quit_Button.sizePolicy().hasHeightForWidth())
         self.quit_Button.setSizePolicy(sizePolicy)
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        font.setBold(False)
+        # font = QtGui.QFont()
+        # font.setPointSize(15)
+        # font.setBold(False)
         ########## 电子皮肤展示按钮 ################
         self.skin_button = QtWidgets.QPushButton(self.formGroupBox)
         self.skin_button.setObjectName("skin_button")
         self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.skin_button)
+        self.skin_button.setFont(font)
         ############## 碰撞演示 ###################
         self.ball_button = QtWidgets.QPushButton(self.formGroupBox)
         self.ball_button.setObjectName("ball_button")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.ball_button)
+        self.ball_button.setFont(font)
         self.ball_button_stop = QtWidgets.QPushButton(self.formGroupBox)
         self.ball_button_stop.setObjectName("ball_button_stop")
         self.formLayout.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.ball_button_stop)
+        self.ball_button_stop.setFont(font)
         ##########################################
         self.quit_Button.setFont(font)
         self.quit_Button.setObjectName("quit_Button")
@@ -144,6 +150,7 @@ class Ui_Form(object):
         self.groupBox_4 = QtWidgets.QGroupBox(Form)
         self.groupBox_4.setGeometry(QtCore.QRect(20, 520, 331, 250))
         self.groupBox_4.setObjectName("groupBox_4")
+        self.groupBox_4.setFont(font)
         self.textBrowser = QtWidgets.QTextBrowser(self.groupBox_4)
         self.textBrowser.setGeometry(QtCore.QRect(60, 60, 211, 61))
         self.textBrowser.setObjectName("textBrowser")
@@ -183,6 +190,7 @@ class Ui_Form(object):
             }
         """)
         self.verticalGroupBox_2.setGeometry(QtCore.QRect(1310, 90, 300, 300))
+        self.verticalGroupBox_2.setFont(font)
         self.layoutWidget = QtWidgets.QWidget(Form)
         self.layoutWidget.setGeometry(QtCore.QRect(1440, 510, 2, 2))
         self.layoutWidget.setObjectName("layoutWidget")
@@ -204,9 +212,9 @@ class Ui_Form(object):
             }
         """)
         self.verticalGroupBox_3.setGeometry(QtCore.QRect(1310, 400, 300, 300))
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(False)
+        # font = QtGui.QFont()
+        # font.setPointSize(15)
+        # font.setBold(False)
         self.verticalGroupBox_3.setFont(font)
         self.verticalGroupBox_3.setObjectName("verticalGroupBox_3")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.verticalGroupBox_3)
