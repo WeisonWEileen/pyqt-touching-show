@@ -1,7 +1,7 @@
 # PyQt Visualization for FPGA accelarating touch sensor Array on Master Machine 
 ---
 
-### 3D reconstruction visualization g
+### 3D reconstruction visualization 
 
 <div style="text-align: center;">
 	<img src="./assets/fpga3.gif" alt="Alt Text" width="400" height="230" />
