@@ -1,0 +1,12 @@
+{
+    "editor.codeActionsOnSave": {},
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "E:\\sustech\\codeRepository\\pyqt-touching-show"
+    },
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "E:\\sustech\\codeRepository\\pyqt-touching-show"
+    },
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "E:\\sustech\\codeRepository\\pyqt-touching-show"
+    }
+}
